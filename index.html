@@ -139,19 +139,43 @@
       :root { --radius: 18px }
     }
     @media (min-width: 721px) { .menu-toggle { display: none } }
+  
+    /* ------------------ Desktop nav enhancements ------------------ */
+    @media (min-width: 721px) {
+      .nav-links { position: relative }
+      .nav-list { list-style: none; display: flex; gap: 28px; padding: 0; margin: 0 }
+      .nav-list > li { position: relative }
+      .nav-list > li > a { position: relative; padding: 6px 0; display: inline-block }
+      /* Fancy underline on hover/focus */
+      .nav-list > li > a::after {
+        content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+        background: linear-gradient(90deg, #0a84ff, #30d158, #bf5af2);
+        transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+        border-radius: 2px;
+      }
+      .nav-list > li > a:hover::after, .nav-list > li > a:focus-visible::after, .nav-list > li > a[aria-current="page"]::after { transform: scaleX(1) }
+
+      /* Dropdown panel */
+    }
+
+    /* Top progress bar when scrolling */
+    .scroll-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 200; background: linear-gradient(90deg, #0a84ff, #30d158, #bf5af2) }
   </style>
 </head>
 <body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header" role="banner">
     <div class="container nav" role="navigation" aria-label="Primary">
       <div class="brand">Spandan Shrestha <span class="dot" aria-hidden="true"></span></div>
       <nav class="nav-links" aria-label="Section links" id="siteNav">
-        <a href="#about" data-nav>About</a>
-        <a href="#projects" data-nav>Projects</a>
-        <a href="#case-studies" data-nav>Case Studies</a>
-        <a href="#resume-section" data-nav>Résumé</a>
+        <ul class="nav-list">
+          <li><a href="#about" data-nav>About</a></li>
+          <li><a href="#projects" data-nav>Projects</a></li>
+          <li><a href="#case-studies" data-nav>Case Studies</a></li>
+          <li><a href="#resume-section" data-nav>Résumé</a></li>
+        </ul>
       </nav>
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">Toggle</button>
@@ -390,6 +414,16 @@
       menuToggle.setAttribute('aria-expanded', 'false');
     }));
 
+    // -------------- Scroll progress bar --------------
+    const sp = document.getElementById('scrollProgress');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight);
+      sp.style.width = (scrolled * 100) + '%';
+    };
+    document.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
     // -------------- Reveal on scroll --------------
     const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
@@ -442,6 +476,10 @@
       });
     }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
     sections.forEach(s => navIO.observe(s));
+
+    // -------------- Basic sanity tests (console) --------------
+    console.assert(!!document.getElementById('siteNav'), 'Test: #siteNav should exist');
+    console.assert(!!document.getElementById('menuToggle'), 'Test: #menuToggle should exist');
   </script>
 </body>
 </html>
